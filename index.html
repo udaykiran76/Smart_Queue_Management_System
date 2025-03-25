@@ -41,14 +41,32 @@
         header {
             background: linear-gradient(135deg, #3498db, #1a5276);
             color: white;
-            text-align: center;
-            padding: 30px 20px;
+            padding: 20px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column; /* Stack the title group and subtitle vertically */
+            align-items: center; /* Center content horizontally */
+        }
+
+        header .title-group {
+            display: flex; /* Use flexbox to align logo and h1 in a row */
+            flex-direction: row;
+            align-items: center; /* Vertically center the logo and h1 */
+            margin-bottom: 5px; /* Space between title group and subtitle */
+        }
+
+        header .logo {
+            max-width: 100px; /* Adjust the size of the logo */
+            margin-right: 15px; /* Space between logo and heading */
         }
 
         header h1 {
             font-size: 2.5rem;
-            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1rem;
+            text-align: center;
         }
 
         /* Search container */
@@ -485,13 +503,36 @@
                 justify-content: space-between;
                 margin-top: 10px;
             }
+
+            header .title-group {
+                flex-direction: column; /* Stack logo and heading on smaller screens */
+                align-items: center;
+            }
+
+            header .logo {
+                max-width: 80px; /* Smaller logo on mobile */
+                margin-right: 0;
+                margin-bottom: 10px; /* Space between logo and heading */
+            }
+
+            header h1 {
+                font-size: 2rem; /* Smaller heading on mobile */
+                text-align: center;
+            }
+
+            header p {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 
 <body>
     <header>
-        <h1>Smart Queue Management System</h1>
+        <div class="title-group">
+            <img src="logo.png" alt="Smart Queue Logo" class="logo">
+            <h1>Smart Queue Management System</h1>
+        </div>
         <p>View wait times and manage your visit to crowded places</p>
     </header>
 
@@ -545,7 +586,7 @@
 
     <div id="location-details-modal" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal">×</span>
             <h2 id="modal-location-name"></h2>
             <div class="modal-details">
                 <div class="queue-metrics">
