@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Queue Management System</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>
+        /* Global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .main-content {
+            flex: 3;
+        }
+
+        .sidebar {
+            flex: 1;
+        }
+
+        /* Header styles */
+        header {
+            background: linear-gradient(135deg, #3498db, #1a5276);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Search container */
+        .search-container {
+            background-color: white;
+            max-width: 800px;
+            margin: -20px auto 20px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+            position: relative;
+        }
+
+        #search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        #category-select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 1rem;
+        }
+
+        #search-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        #search-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Location list styles */
+        .location-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .location-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .location-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .location-item:last-child {
+            border-bottom: none;
+        }
+
+        .location-info {
+            flex: 1;
+        }
+
+        .location-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .location-category {
+            display: inline-block;
+            font-size: 0.8rem;
+            background-color: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .location-address {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .wait-info {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .wait-time {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .crowd-status {
+            font-size: 0.9rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .status-low {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+
+        .status-moderate {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .status-high {
+            background-color: #fadbd8;
+            color: #c0392b;
+        }
+
+        /* Sidebar panels */
+        .alert-panel,
+        .alternatives-panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-panel h3,
+        .alternatives-panel h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .alert-panel p,
+        .alternatives-panel p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        /* Alert form */
+        .alert-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #alert-location {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #add-alert {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        /* Alert and alternatives items */
+        .alert-item,
+        .alternative-item {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .alert-item h4,
+        .alternative-item h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .alert-item p,
+        .alternative-item p {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .alternative-item .distance {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .alternative-item .wait-comparison {
+            color: #27ae60;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        /* Refresh info */
+        .refresh-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        #last-updated {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        #refresh-button {
+            background-color: transparent;
+            border: 1px solid #3498db;
+            color: #3498db;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #refresh-button:hover {
+            background-color: #3498db;
+            color: white;
+        }
+
+        /* Section headers */
+        h2 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 700px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        #modal-location-name {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .queue-metrics {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric h3 {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .large-metric {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .crowd-meter {
+            width: 200px;
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px auto;
+        }
+
+        .crowd-level {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c);
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .queue-history {
+            margin-bottom: 30px;
+        }
+
+        .trend-chart {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            height: 150px;
+            padding: 10px;
+            position: relative;
+        }
+
+        .trend-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #3498db;
+            border-radius: 50%;
+            margin-top: -4px;
+            margin-left: -4px;
+        }
+
+        .trend-line {
+            position: absolute;
+            height: 2px;
+            background-color: #3498db;
+            z-index: 1;
+        }
+
+        .location-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .location-actions button {
+            padding: 12px 25px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #set-alert-button {
+            background-color: #3498db;
+            color: white;
+        }
+
+        #set-alert-button:hover {
+            background-color: #2980b9;
+        }
+
+        #directions-button {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            border: 1px solid #ddd;
+        }
+
+        #directions-button:hover {
+            background-color: #ecf0f1;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .search-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .queue-metrics {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .location-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .wait-info {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Smart Queue Management System</h1>
+        <p>View wait times and manage your visit to crowded places</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search for hospitals, banks, restaurants...">
+        <select id="category-select">
+            <option value="all">All Categories</option>
+            <option value="hospital">Hospitals</option>
+            <option value="bank">Banks</option>
+            <option value="restaurant">Restaurants</option>
+        </select>
+        <button id="search-button">Search</button>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <h2>Live Queue Status</h2>
+            <div class="refresh-info">
+                <span id="last-updated">Last updated: Just now</span>
+                <button id="refresh-button">Refresh Data</button>
+            </div>
+            <div id="location-list" class="location-list">
+                <!-- Locations will be dynamically added here -->
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <div class="alert-panel">
+                <h3>Queue Alerts</h3>
+                <p>Get notified when queues get shorter</p>
+                <div id="alert-list">
+                    <!-- Alerts will be added here -->
+                </div>
+                <div class="alert-form">
+                    <select id="alert-location">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <button id="add-alert">Add Alert</button>
+                </div>
+            </div>
+
+            <div class="alternatives-panel">
+                <h3>Alternative Locations</h3>
+                <p>Places with shorter queues nearby</p>
+                <div id="alternatives-list">
+                    <!-- Alternatives will be added here -->
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div id="location-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-location-name"></h2>
+            <div class="modal-details">
+                <div class="queue-metrics">
+                    <div class="metric">
+                        <h3>Current Wait Time</h3>
+                        <p id="modal-wait-time" class="large-metric"></p>
+                    </div>
+                    <div class="metric">
+                        <h3>Crowd Density</h3>
+                        <div id="modal-crowd-meter" class="crowd-meter">
+                            <div id="modal-crowd-level" class="crowd-level"></div>
+                        </div>
+                        <p id="modal-crowd-percentage"></p>
+                    </div>
+                </div>
+                <div class="queue-history">
+                    <h3>Queue Trend (Last 2 Hours)</h3>
+                    <div id="queue-trend-chart" class="trend-chart">
+                        <!-- Simple chart will be drawn here -->
+                    </div>
+                </div>
+                <div class="location-actions">
+                    <button id="set-alert-button">Set Alert</button>
+                    <button id="directions-button">Get Directions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Smart Queue Management System - Demo Version</p>
+        <p>Data is randomly generated for demonstration purposes</p>
+    </footer>
+
+    <!-- <script src="script.js"></script> -->
+    <script>
+        // Sample location data
+        const locationData = [
+            {
+                id: 1,
+                name: "City General Hospital",
+                category: "hospital",
+                address: "123 Main Street, Downtown",
+                latitude: 40.7128,
+                longitude: -74.0060
+            },
+            {
+                id: 2,
+                name: "Westside Medical Center",
+                category: "hospital",
+                address: "456 West Avenue, Westside",
+                latitude: 40.7145,
+                longitude: -74.0080
+            },
+            {
+                id: 3,
+                name: "First National Bank",
+                category: "bank",
+                address: "789 Financial Street, Business District",
+                latitude: 40.7120,
+                longitude: -74.0070
+            },
+            {
+                id: 4,
+                name: "Community Credit Union",
+                category: "bank",
+                address: "321 Market Street, Downtown",
+                latitude: 40.7135,
+                longitude: -74.0065
+            },
+            {
+                id: 5,
+                name: "The Gourmet Kitchen",
+                category: "restaurant",
+                address: "555 Food Avenue, Restaurant Row",
+                latitude: 40.7140,
+                longitude: -74.0050
+            },
+            {
+                id: 6,
+                name: "Seaside Seafood",
+                category: "restaurant",
+                address: "678 Ocean Boulevard, Marina District",
+                latitude: 40.7150,
+                longitude: -74.0040
+            },
+            {
+                id: 7,
+                name: "Eastside Health Clinic",
+                category: "hospital",
+                address: "910 East Street, Eastside",
+                latitude: 40.7155,
+                longitude: -74.0030
+            },
+            {
+                id: 8,
+                name: "Central Savings Bank",
+                category: "bank",
+                address: "234 Central Avenue, Midtown",
+                latitude: 40.7115,
+                longitude: -74.0075
+            },
+            {
+                id: 9,
+                name: "Taste of Italy",
+                category: "restaurant",
+                address: "876 Pasta Lane, Little Italy",
+                latitude: 40.7125,
+                longitude: -74.0055
+            }
+        ];
+
+        // Queue data storage
+        let queueData = {};
+        let alertLocations = [];
+        let updateInterval;
+        let trendData = {};
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            // Generate initial random queue data
+            generateAllQueueData();
+
+            // Display all locations on load
+            displayLocations(locationData);
+
+            // Populate alert dropdown
+            populateAlertDropdown();
+
+            // Find alternatives with shorter queues
+            updateAlternativeLocations();
+
+            // Set up event listeners
+            setupEventListeners();
+
+            // Start the automatic data refresh
+            startDataRefresh();
+        });
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Search button click
+            document.getElementById('search-button').addEventListener('click', searchLocations);
+
+            // Search input enter key
+            document.getElementById('search-input').addEventListener('keyup', function (event) {
+                if (event.key === 'Enter') {
+                    searchLocations();
+                }
+            });
+
+            // Category select change
+            document.getElementById('category-select').addEventListener('change', searchLocations);
+
+            // Refresh button click
+            document.getElementById('refresh-button').addEventListener('click', function () {
+                generateAllQueueData();
+                displayLocations(filterLocations());
+                updateAlternativeLocations();
+                updateLastRefreshed();
+            });
+
+            // Add alert button click
+            document.getElementById('add-alert').addEventListener('click', addAlert);
+
+            // Modal close button
+            document.querySelector('.close-modal').addEventListener('click', closeModal);
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function (event) {
+                if (event.target === document.getElementById('location-details-modal')) {
+                    closeModal();
+                }
+            });
+
+            // Set alert button in modal
+            document.getElementById('set-alert-button').addEventListener('click', function () {
+                const locationId = document.getElementById('modal-location-name').dataset.locationId;
+                addAlertForLocation(locationId);
+                closeModal();
+            });
+
+            // Get directions button (placeholder functionality)
+            document.getElementById('directions-button').addEventListener('click', function () {
+                alert('Directions functionality would open a map in a real application.');
+            });
+        }
+
+        // Generate random queue data for all locations
+        function generateAllQueueData() {
+            locationData.forEach(location => {
+                queueData[location.id] = generateRandomQueueData();
+
+                // Initialize trend data if it doesn't exist
+                if (!trendData[location.id]) {
+                    trendData[location.id] = [];
+                }
+
+                // Add new data point to trend (keeping only last 12 points - representing 2 hours with 10 min intervals)
+                trendData[location.id].push(queueData[location.id].waitTime);
+                if (trendData[location.id].length > 12) {
+                    trendData[location.id].shift();
+                }
+            });
+
+            // Check alerts after data update
+            checkAlerts();
+        }
+
+        // Generate random queue data for a single location
+        function generateRandomQueueData() {
+            // Generate random wait time (5 to 60 minutes)
+            const waitTime = Math.floor(Math.random() * 56) + 5;
+
+            // Generate random crowd density (0 to 100%)
+            const crowdDensity = Math.floor(Math.random() * 101);
+
+            // Determine crowd status based on density
+            let crowdStatus;
+            if (crowdDensity < 30) {
+                crowdStatus = 'Low';
+            } else if (crowdDensity < 70) {
+                crowdStatus = 'Moderate';
+            } else {
+                crowdStatus = 'High';
+            }
+
+            return {
+                waitTime,
+                crowdDensity,
+                crowdStatus
+            };
+        }
+
+        // Display locations in the location list
+        function displayLocations(locations) {
+            const locationList = document.getElementById('location-list');
+            locationList.innerHTML = '';
+
+            if (locations.length === 0) {
+                locationList.innerHTML = '<div class="no-results">No matching locations found.</div>';
+                return;
+            }
+
+            locations.forEach(location => {
+                const queueInfo = queueData[location.id];
+                const locationElement = document.createElement('div');
+                locationElement.className = 'location-item';
+                locationElement.dataset.locationId = location.id;
+
+                locationElement.innerHTML = `
+            <div class="location-info">
+                <div class="location-name">${location.name}</div>
+                <span class="location-category">${capitalizeFirstLetter(location.category)}</span>
+                <div class="location-address">${location.address}</div>
+            </div>
+            <div class="wait-info">
+                <div class="wait-time">${queueInfo.waitTime} min</div>
+                <span class="crowd-status status-${queueInfo.crowdStatus.toLowerCase()}">${queueInfo.crowdStatus}</span>
+            </div>
+        `;
+
+                // Add click event to show location details
+                locationElement.addEventListener('click', function () {
+                    showLocationDetails(location);
+                });
+
+                locationList.appendChild(locationElement);
+            });
+        }
+
+        // Show location details in modal
+        function showLocationDetails(location) {
+            const modal = document.getElementById('location-details-modal');
+            const locationName = document.getElementById('modal-location-name');
+            const waitTime = document.getElementById('modal-wait-time');
+            const crowdLevel = document.getElementById('modal-crowd-level');
+            const crowdPercentage = document.getElementById('modal-crowd-percentage');
+            const queueInfo = queueData[location.id];
+
+            // Set location details
+            locationName.textContent = location.name;
+            locationName.dataset.locationId = location.id;
+            waitTime.textContent = `${queueInfo.waitTime} minutes`;
+            crowdLevel.style.width = `${queueInfo.crowdDensity}%`;
+            crowdPercentage.textContent = `${queueInfo.crowdDensity}% (${queueInfo.crowdStatus})`;
+
+            // Generate trend chart
+            generateTrendChart(location.id);
+
+            // Show modal
+            modal.style.display = 'block';
+        }
+
+        // Generate simple trend chart
+        function generateTrendChart(locationId) {
+            const chartContainer = document.getElementById('queue-trend-chart');
+            chartContainer.innerHTML = '';
+
+            const data = trendData[locationId] || [];
+            if (data.length === 0) return;
+
+            // Find max value for scaling
+            const maxValue = Math.max(...data);
+            const chartHeight = 130; // Pixels
+
+            // Create chart points and lines
+            for (let i = 0; i < data.length; i++) {
+                const pointX = (i / (data.length - 1)) * 100;
+                const pointY = chartHeight - ((data[i] / maxValue) * chartHeight);
+
+                // Create point
+                const point = document.createElement('div');
+                point.className = 'trend-point';
+                point.style.left = `${pointX}%`;
+                point.style.top = `${pointY}px`;
+                point.title = `${data[i]} min`;
+                chartContainer.appendChild(point);
+
+                // Create line connecting points (except for the first point)
+                if (i > 0) {
+                    const prevPointX = ((i - 1) / (data.length - 1)) * 100;
+                    const prevPointY = chartHeight - ((data[i - 1] / maxValue) * chartHeight);
+
+                    const lineLength = Math.sqrt(Math.pow(pointX - prevPointX, 2) + Math.pow(pointY - prevPointY, 2));
+                    const angle = Math.atan2(pointY - prevPointY, pointX - prevPointX) * (180 / Math.PI);
+
+                    const line = document.createElement('div');
+                    line.className = 'trend-line';
+                    line.style.width = `${lineLength}%`;
+                    line.style.left = `${prevPointX}%`;
+                    line.style.top = `${prevPointY}px`;
+                    line.style.transform = `rotate(${angle}deg)`;
+                    line.style.transformOrigin = '0 0';
+
+                    chartContainer.appendChild(line);
+                }
+            }
+
+            // Add time labels
+            const timeLabelsContainer = document.createElement('div');
+            timeLabelsContainer.className = 'time-labels';
+            timeLabelsContainer.style.display = 'flex';
+            timeLabelsContainer.style.justifyContent = 'space-between';
+            timeLabelsContainer.style.marginTop = '5px';
+            timeLabelsContainer.style.color = '#7f8c8d';
+            timeLabelsContainer.style.fontSize = '0.8rem';
+
+            timeLabelsContainer.innerHTML = `
+        <span>2 hours ago</span>
+        <span>Now</span>
+    `;
+
+            chartContainer.appendChild(timeLabelsContainer);
+        }
+
+        // Close the modal
+        function closeModal() {
+            document.getElementById('location-details-modal').style.display = 'none';
+        }
+
+        // Search locations based on input and category
+        function searchLocations() {
+            const filteredLocations = filterLocations();
+            displayLocations(filteredLocations);
+        }
+
+        // Filter locations based on search input and category
+        function filterLocations() {
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
+            const selectedCategory = document.getElementById('category-select').value;
+
+            return locationData.filter(location => {
+                const matchesSearch = location.name.toLowerCase().includes(searchInput) ||
+                    location.address.toLowerCase().includes(searchInput);
+                const matchesCategory = selectedCategory === 'all' || location.category === selectedCategory;
+
+                return matchesSearch && matchesCategory;
+            });
+        }
+
+        // Add a location to alert list
+        function addAlert() {
+            const alertSelect = document.getElementById('alert-location');
+            const locationId = alertSelect.value;
+
+            if (locationId) {
+                addAlertForLocation(locationId);
+            }
+        }
+
+        // Add alert for specific location
+        function addAlertForLocation(locationId) {
+            // Check if already in alerts
+            if (alertLocations.includes(locationId)) {
+                alert('This location is already in your alerts.');
+                return;
+            }
+
+            alertLocations.push(locationId);
+
+            // Update the alerts list
+            updateAlertsList();
+
+            // Show confirmation
+            alert('Alert added! You will be notified when the queue gets shorter.');
+        }
+
+        // Update the alerts list display
+        function updateAlertsList() {
+            const alertList = document.getElementById('alert-list');
+            alertList.innerHTML = '';
+
+            if (alertLocations.length === 0) {
+                alertList.innerHTML = '<p>No alerts set. Add a location to get notified.</p>';
+                return;
+            }
+
+            alertLocations.forEach(locationId => {
+                const location = locationData.find(loc => loc.id == locationId);
+                const queueInfo = queueData[locationId];
+
+                const alertItem = document.createElement('div');
+                alertItem.className = 'alert-item';
+
+                alertItem.innerHTML = `
+            <h4>${location.name}</h4>
+            <p>Current wait: ${queueInfo.waitTime} min</p>
+            <button class="remove-alert" data-location-id="${locationId}">Remove</button>
+        `;
+
+                // Add remove button functionality
+                alertItem.querySelector('.remove-alert').addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    removeAlert(locationId);
+                });
+
+                alertList.appendChild(alertItem);
+            });
+        }
+
+        // Remove alert for a location
+        function removeAlert(locationId) {
+            const index = alertLocations.indexOf(locationId);
+            if (index > -1) {
+                alertLocations.splice(index, 1);
+                updateAlertsList();
+            }
+        }
+
+        // Check for improvements in queue times for alert locations
+        function checkAlerts() {
+            // In a real app, this would compare against previous data
+            // For demo, we'll simulate alerts randomly
+
+            if (alertLocations.length > 0 && Math.random() > 0.7) {
+                // Randomly pick one of the alert locations
+                const randomIndex = Math.floor(Math.random() * alertLocations.length);
+                const locationId = alertLocations[randomIndex];
+                const location = locationData.find(loc => loc.id == locationId);
+
+                // Create notification
+                alert(`Queue Alert: ${location.name} now has a shorter wait time!`);
+            }
+        }
+
+        // Update alternative locations with shorter queues
+        function updateAlternativeLocations() {
+            const alternativesList = document.getElementById('alternatives-list');
+            alternativesList.innerHTML = '';
+
+            if (locationData.length === 0) {
+                alternativesList.innerHTML = '<p>No locations available.</p>';
+                return;
+            }
+
+            // Group locations by category
+            const categorizedLocations = {};
+            locationData.forEach(location => {
+                if (!categorizedLocations[location.category]) {
+                    categorizedLocations[location.category] = [];
+                }
+                categorizedLocations[location.category].push(location);
+            });
+
+            // Find locations with shortest queues in each category
+            const alternatives = [];
+
+            for (const category in categorizedLocations) {
+                // Sort locations by wait time
+                const sortedLocations = [...categorizedLocations[category]].sort((a, b) => {
+                    return queueData[a.id].waitTime - queueData[b.id].waitTime;
+                });
+
+                // Take the shortest queue location
+                if (sortedLocations.length > 0) {
+                    alternatives.push(sortedLocations[0]);
+                }
+            }
+
+            // Display alternative locations
+            alternatives.forEach(location => {
+                const queueInfo = queueData[location.id];
+
+                const alternativeItem = document.createElement('div');
+                alternativeItem.className = 'alternative-item';
+
+                // Calculate average wait time for this category
+                const categoryLocations = categorizedLocations[location.category];
+                const avgWaitTime = categoryLocations.reduce((sum, loc) => sum + queueData[loc.id].waitTime, 0) / categoryLocations.length;
+                const waitDiff = Math.round(avgWaitTime - queueInfo.waitTime);
+
+                alternativeItem.innerHTML = `
+            <h4>${location.name}</h4>
+            <p>Wait: ${queueInfo.waitTime} min</p>
+            <div class="distance">~2.1 miles away</div>
+            <div class="wait-comparison">${waitDiff > 0 ? `${waitDiff} min faster than average` : 'Fastest option available'}</div>
+        `;
+
+                // Add click event to show location details
+                alternativeItem.addEventListener('click', function () {
+                    showLocationDetails(location);
+                });
+
+                alternativesList.appendChild(alternativeItem);
+            });
+        }
+
+        // Populate the alert location dropdown
+        function populateAlertDropdown() {
+            const alertSelect = document.getElementById('alert-location');
+            alertSelect.innerHTML = '<option value="">Select a location</option>';
+
+            locationData.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location.id;
+                option.textContent = location.name;
+                alertSelect.appendChild(option);
+            });
+        }
+
+        // Start automatic data refresh
+        function startDataRefresh() {
+            // Update data every 30 seconds
+            updateInterval = setInterval(() => {
+                generateAllQueueData();
+                const filteredLocations = filterLocations();
+                displayLocations(filteredLocations);
+                updateAlternativeLocations();
+                updateLastRefreshed();
+            }, 30000);
+        }
+
+        // Update last refreshed time display
+        function updateLastRefreshed() {
+            const lastUpdated = document.getElementById('last-updated');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            lastUpdated.textContent = `Last updated: ${timeString}`;
+        }
+
+        // Helper function to capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Calculate distance between two coordinates (in km) using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+
+        // Convert km to miles
+        function kmToMiles(km) {
+            return km * 0.621371;
+        }
+
+        // Initialize the app when the page loads
+        updateLastRefreshed();
+    </script>
+</body>
+
+</html>
